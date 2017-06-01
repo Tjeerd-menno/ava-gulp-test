@@ -1,11 +1,15 @@
 import test from 'ava';
+import {fromString} from './helpers/pipe';
 
-test('foo', t => {
-	t.pass();
-});
+import sass from './lib/sass';
 
-test('bar', async t => {
-	const bar = Promise.resolve('bar');
+test('compiles', t => {
+  const input = '$foo: red; body { background: $foo; }';
+  const expected = 'body {\n  background: red; }\n\n/*# sourceMappingURL=../maps/sass/style.css.map */\n';
 
-	t.is(await bar, 'bar');
+  return fromString(input, 'sass/style.scss', sass)
+    .then(output => {
+      const contents = output.contents.toString();
+      t.is(contents, expected, 'Sass compiled as expected');
+    });
 });
